@@ -1,0 +1,8 @@
+{
+    "urnmapping": {
+        "assets/Game1_sprite1_v2.0.png": "YXNzZXRzL0dhbWUxX3Nwcml0ZTFfdjIuMC5wbmc=.png",
+        "assets/Game1_sprite2_v1.png": "YXNzZXRzL0dhbWUxX3Nwcml0ZTJfdjEucG5n.png",
+        "assets/welcome.mp3": "YXNzZXRzL3dlbGNvbWUubXAz.mp3"
+    },
+    "version": 1.0
+}
