@@ -2,7 +2,7 @@
 /*
  * @title: Game 1
  * @description:
- * My game1. Later there will be a awesome description found here ;-)
+ * version 011alpha
  */
 
 /*{{ javascript("jslib/draw2d.js") }}*/
@@ -46,71 +46,71 @@ TurbulenzEngine.onload = function onLoadFn() {
 	var loadAssets = function loadAssetsFn(mappingTable) {
 		//TODO make awesome things happen!
 
-        //textures
-        var sprite1URL = mappingTable.getURL("assets/Game1_sprite1_v2.0.png");
-        var sprite2URL = mappingTable.getURL("assets/Game1_sprite2_v1.png");
-        var sprite1 = graphicsDevice.createTexture({
-		src : sprite1URL,
-		mipmaps : true,
-		onload : function(texture) {
-			if (texture) {
-				layer0.setTexture(texture);
-				layer1.setTexture(texture);
-				layer2.setTexture(texture);
-				car_body.setTexture(texture);
-				car_wheel1.setTexture(texture);
-				car_wheel2.setTexture(texture);
+		//textures
+		var sprite1URL = mappingTable.getURL("assets/Game1_sprite1_v2.0.png");
+		var sprite2URL = mappingTable.getURL("assets/Game1_sprite2_v1.png");
+		var sprite1 = graphicsDevice.createTexture({
+			src : sprite1URL,
+			mipmaps : true,
+			onload : function(texture) {
+				if (texture) {
+					layer0.setTexture(texture);
+					layer1.setTexture(texture);
+					layer2.setTexture(texture);
+					car_body.setTexture(texture);
+					car_wheel1.setTexture(texture);
+					car_wheel2.setTexture(texture);
 
-				layer0.setTextureRectangle([0, 0, 1920, 1080]);
-				layer0.setOrigin([1920 / 2, 1080 / 2]);
-				layer1.setTextureRectangle([0, 1080, 1920, 1216]);
-				layer1.setOrigin([960, 68]);
-				layer2.setTextureRectangle([0, 1300, 1138, 2042]);
-				car_body.setTextureRectangle([1138, 1406, 1582, 1596]);
-				car_wheel1.setTextureRectangle([1920, 272, 2020, 372]);
-				car_wheel2.setTextureRectangle([1920, 272, 2020, 372]);
+					layer0.setTextureRectangle([0, 0, 1920, 1080]);
+					layer0.setOrigin([1920 / 2, 1080 / 2]);
+					layer1.setTextureRectangle([0, 1080, 1920, 1216]);
+					layer1.setOrigin([960, 68]);
+					layer2.setTextureRectangle([0, 1300, 1138, 2042]);
+					car_body.setTextureRectangle([1138, 1406, 1582, 1596]);
+					car_wheel1.setTextureRectangle([1920, 272, 2020, 372]);
+					car_wheel2.setTextureRectangle([1920, 272, 2020, 372]);
 
-				loadedItems++;
-				screen = 1;
+					loadedItems++;
+					screen = 1;
+				}
 			}
-		}
-	});
-	var sprite2 = graphicsDevice.createTexture({
-		src : sprite2URL,
-		mipmaps : true,
-		onload : function(texture) {
-			if (texture) {
-				button1.setTexture(texture);
-				button1.setTextureRectangle([0, 0, 730, 730]);
-				num0.setTexture(texture);
-				num1.setTexture(texture);
-				num2.setTexture(texture);
-				num3.setTexture(texture);
-				num4.setTexture(texture);
-				num5.setTexture(texture);
-				num6.setTexture(texture);
-				num7.setTexture(texture);
-				num8.setTexture(texture);
-				num9.setTexture(texture);
-				layer3.setTexture(texture);
+		});
+		var sprite2 = graphicsDevice.createTexture({
+			src : sprite2URL,
+			mipmaps : true,
+			onload : function(texture) {
+				if (texture) {
+					button1.setTexture(texture);
+					button1.setTextureRectangle([0, 0, 730, 730]);
+					num0.setTexture(texture);
+					num1.setTexture(texture);
+					num2.setTexture(texture);
+					num3.setTexture(texture);
+					num4.setTexture(texture);
+					num5.setTexture(texture);
+					num6.setTexture(texture);
+					num7.setTexture(texture);
+					num8.setTexture(texture);
+					num9.setTexture(texture);
+					layer3.setTexture(texture);
 
-				num0.setTextureRectangle([0, 1024, 100, 1164]);
-				num1.setTextureRectangle([100, 1024, 200, 1164]);
-				num2.setTextureRectangle([200, 1024, 300, 1164]);
-				num3.setTextureRectangle([300, 1024, 400, 1164]);
-				num4.setTextureRectangle([400, 1024, 500, 1164]);
-				num5.setTextureRectangle([500, 1024, 600, 1164]);
-				num6.setTextureRectangle([600, 1024, 700, 1164]);
-				num7.setTextureRectangle([700, 1024, 800, 1164]);
-				num8.setTextureRectangle([800, 1024, 900, 1164]);
-				num9.setTextureRectangle([900, 1024, 1000, 1164]);
-				layer3.setTextureRectangle([0, 800, 1920, 1880]);
+					num0.setTextureRectangle([0, 1024, 100, 1164]);
+					num1.setTextureRectangle([100, 1024, 200, 1164]);
+					num2.setTextureRectangle([200, 1024, 300, 1164]);
+					num3.setTextureRectangle([300, 1024, 400, 1164]);
+					num4.setTextureRectangle([400, 1024, 500, 1164]);
+					num5.setTextureRectangle([500, 1024, 600, 1164]);
+					num6.setTextureRectangle([600, 1024, 700, 1164]);
+					num7.setTextureRectangle([700, 1024, 800, 1164]);
+					num8.setTextureRectangle([800, 1024, 900, 1164]);
+					num9.setTextureRectangle([900, 1024, 1000, 1164]);
+					layer3.setTextureRectangle([0, 800, 1920, 1880]);
 
-				loadedItems++;
+					loadedItems++;
+				}
 			}
-		}
-	});
-        
+		});
+
 		//sound
 		var soundURL = mappingTable.getURL("assets/welcome.mp3");
 		soundDevice.createSound({
@@ -356,7 +356,8 @@ TurbulenzEngine.onload = function onLoadFn() {
 		x : viewport.px_width / 2,
 		y : viewport.px_height / 2,
 		width : 444,
-		height : 190
+		height : 190,
+		origin : [444 / 2, (190 / 2) + 30]
 	});
 	//TODO add custom car/color picker
 	var car_wheel1 = Draw2DSprite.create({
@@ -434,7 +435,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 		width : 100,
 		height : 140
 	});
-	
+
 	//===================================================
 	//   Sound                                          =
 	//===================================================
@@ -503,9 +504,6 @@ TurbulenzEngine.onload = function onLoadFn() {
 	var prevTime = TurbulenzEngine.time;
 
 	function mainLoop() {
-		carpos = car.rigidBody.getPosition();
-		carL = car.wheelL_rB.getPosition();
-		carR = car.wheelR_rB.getPosition();
 		//Tick Tock Tick Tock...
 		var curTime = TurbulenzEngine.time;
 		var timeDelta = (curTime - prevTime);
@@ -525,7 +523,12 @@ TurbulenzEngine.onload = function onLoadFn() {
 				world.step(1 / 60);
 			}
 
-			p_debug.setPhysics2DViewport([viewport.x, viewport.y, viewport.m_width, viewport.m_height]);
+			carpos = car.rigidBody.getPosition();
+			carL = car.wheelL_rB.getPosition();
+			carR = car.wheelR_rB.getPosition();
+
+			p_debug.setScreenViewport(draw2D.getScreenSpaceViewport());
+			// p_debug.setPhysics2DViewport([viewport.x, viewport.y, viewport.m_width, viewport.m_height]);
 			p_debug.begin();
 			p_debug.drawWorld(world);
 
@@ -533,10 +536,10 @@ TurbulenzEngine.onload = function onLoadFn() {
 			car_body.y = carpos[1] * 30;
 			car_body.rotation = car.rigidBody.getRotation();
 			car_wheel1.x = carL[0] * 30;
-			car_wheel1.y = (carL[1] + 1) * 30;
+			car_wheel1.y = carL[1] * 30;
 			car_wheel1.rotation = car.wheelL_rB.getRotation();
 			car_wheel2.x = carR[0] * 30;
-			car_wheel2.y = (carR[1] + 1) * 30;
+			car_wheel2.y = carR[1] * 30;
 			car_wheel2.rotation = car.wheelR_rB.getRotation();
 
 			if (carpos[0] > (1920 / 30)) {
