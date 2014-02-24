@@ -2,7 +2,7 @@
 /*
  * @title: Game 1
  * @description:
- * version 011alpha
+ * version 014alpha
  */
 
 /*{{ javascript("jslib/draw2d.js") }}*/
@@ -15,6 +15,8 @@
 /*{{ javascript("jslib/physics2ddebugdraw.js") }}*/
 /*{{ javascript("jslib/boxtree.js") }}*/
 /*{{ javascript("jslib/services/mappingtable.js") }}*/
+/*{{ javascript("jslib/texturemanager.js") }}*/
+/*{{ javascript("jslib/observer.js") }}*/
 
 TurbulenzEngine.onload = function onLoadFn() {
 	//===================================================
@@ -23,15 +25,21 @@ TurbulenzEngine.onload = function onLoadFn() {
 	var bgColor = [0.1, 0.1, 0.2, 1];
 	//TODO clean
 	var screen = 0;
+	var car = null;
+	var cool_floor;
 	var carpos = null;
 	var carL = null;
 	var carR = null;
-	var debugZeichnen = true;
 	var startMusicSound = null;
+
+	var errorCallback = function errorCallbackFn(msg) {
+		window.alert(msg);
+	};
 
 	var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
 	var mathDevice = TurbulenzEngine.createMathDevice({});
 	var requestHandler = RequestHandler.create({});
+	var textureManager = TextureManager.create(graphicsDevice, requestHandler, null, errorCallback);
 
 	var viewport = {
 		scale : 30,
@@ -43,90 +51,8 @@ TurbulenzEngine.onload = function onLoadFn() {
 		m_height : 1080 / 30
 	};
 
-	var loadAssets = function loadAssetsFn(mappingTable) {
-		//TODO make awesome things happen!
-
-		//textures
-		var sprite1URL = mappingTable.getURL("assets/Game1_sprite1_v2.0.png");
-		var sprite2URL = mappingTable.getURL("assets/Game1_sprite2_v1.png");
-		var sprite1 = graphicsDevice.createTexture({
-			src : sprite1URL,
-			mipmaps : true,
-			onload : function(texture) {
-				if (texture) {
-					layer0.setTexture(texture);
-					layer1.setTexture(texture);
-					layer2.setTexture(texture);
-					car_body.setTexture(texture);
-					car_wheel1.setTexture(texture);
-					car_wheel2.setTexture(texture);
-
-					layer0.setTextureRectangle([0, 0, 1920, 1080]);
-					layer0.setOrigin([1920 / 2, 1080 / 2]);
-					layer1.setTextureRectangle([0, 1080, 1920, 1216]);
-					layer1.setOrigin([960, 68]);
-					layer2.setTextureRectangle([0, 1300, 1138, 2042]);
-					car_body.setTextureRectangle([1138, 1406, 1582, 1596]);
-					car_wheel1.setTextureRectangle([1920, 272, 2020, 372]);
-					car_wheel2.setTextureRectangle([1920, 272, 2020, 372]);
-
-					loadedItems++;
-					screen = 1;
-				}
-			}
-		});
-		var sprite2 = graphicsDevice.createTexture({
-			src : sprite2URL,
-			mipmaps : true,
-			onload : function(texture) {
-				if (texture) {
-					button1.setTexture(texture);
-					button1.setTextureRectangle([0, 0, 730, 730]);
-					num0.setTexture(texture);
-					num1.setTexture(texture);
-					num2.setTexture(texture);
-					num3.setTexture(texture);
-					num4.setTexture(texture);
-					num5.setTexture(texture);
-					num6.setTexture(texture);
-					num7.setTexture(texture);
-					num8.setTexture(texture);
-					num9.setTexture(texture);
-					layer3.setTexture(texture);
-
-					num0.setTextureRectangle([0, 1024, 100, 1164]);
-					num1.setTextureRectangle([100, 1024, 200, 1164]);
-					num2.setTextureRectangle([200, 1024, 300, 1164]);
-					num3.setTextureRectangle([300, 1024, 400, 1164]);
-					num4.setTextureRectangle([400, 1024, 500, 1164]);
-					num5.setTextureRectangle([500, 1024, 600, 1164]);
-					num6.setTextureRectangle([600, 1024, 700, 1164]);
-					num7.setTextureRectangle([700, 1024, 800, 1164]);
-					num8.setTextureRectangle([800, 1024, 900, 1164]);
-					num9.setTextureRectangle([900, 1024, 1000, 1164]);
-					layer3.setTextureRectangle([0, 800, 1920, 1880]);
-
-					loadedItems++;
-				}
-			}
-		});
-
-		//sound
-		var soundURL = mappingTable.getURL("assets/welcome.mp3");
-		soundDevice.createSound({
-			src : soundURL,
-			onload : function(sound) {
-				if (sound) {
-					startMusicSound = sound;
-				} else {
-					console.log("Failed to load sound...");
-				}
-				loadedItems++;
-			}
-		});
-	};
-
 	var mappingTableReceived = function mappingTableReceivedFn(mappingTable) {
+		textureManager.setPathRemapping(mappingTable.urlMapping, mappingTable.assetPrefix);
 		loadAssets(mappingTable);
 	};
 
@@ -137,8 +63,9 @@ TurbulenzEngine.onload = function onLoadFn() {
 
 	gameSession = TurbulenzServices.createGameSession(requestHandler, sessionCreated);
 
+	//Initialize
 	//===================================================
-	//   Physk                                          =
+	//   Physik                                          =
 	//===================================================
 	var phys2D = Physics2DDevice.create();
 	var p_debug = Physics2DDebugDraw.create({
@@ -148,159 +75,8 @@ TurbulenzEngine.onload = function onLoadFn() {
 
 	//world
 	var world = phys2D.createWorld({
-		gravity : [0, 10] //TODO adjust gravity!
+		gravity : [0, 30]
 	});
-
-	var cool_floor = {
-		width : 2000 / viewport.scale,
-		height : 1080 / viewport.scale,
-		position : [0, 1080 / viewport.scale]
-	};
-	cool_floor.shape1 = phys2D.createPolygonShape({
-		vertices : [[0, 0], [0, -400 / viewport.scale], [200 / viewport.scale, -400 / viewport.scale], [200 / viewport.scale, 0]]
-	});
-	cool_floor.shape2 = phys2D.createPolygonShape({
-		vertices : [[200 / viewport.scale, -300 / viewport.scale], [200 / viewport.scale, -400 / viewport.scale], [400 / viewport.scale, -300 / viewport.scale]]
-	});
-	cool_floor.shape3 = phys2D.createPolygonShape({
-		vertices : [[400 / viewport.scale, -200 / viewport.scale], [400 / viewport.scale, -300 / viewport.scale], [800 / viewport.scale, -300 / viewport.scale], [800 / viewport.scale, -200 / viewport.scale]]
-	});
-	cool_floor.shape4 = phys2D.createPolygonShape({
-		vertices : [[800 / viewport.scale, -300 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale]]
-	});
-	cool_floor.shape5 = phys2D.createPolygonShape({
-		vertices : [[1200 / viewport.scale, -400 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale], [2000 / viewport.scale, -400 / viewport.scale]]
-	});
-	cool_floor.rB = phys2D.createRigidBody({
-		type : 'static',
-		shapes : [cool_floor.shape1, cool_floor.shape2, cool_floor.shape3, cool_floor.shape4, cool_floor.shape5],
-		position : cool_floor.position
-	});
-	world.addRigidBody(cool_floor.rB);
-
-	//car
-	var car = {
-		position : [viewport.m_width / 2, viewport.m_height / 3]
-	};
-	car.shape1 = phys2D.createPolygonShape({
-		vertices : [[-217 / viewport.scale, 69.5 / viewport.scale], [-217 / viewport.scale, 19.5 / viewport.scale], [140 / viewport.scale, 19.5 / viewport.scale], [140 / viewport.scale, 69.5 / viewport.scale]],
-		group : 4,
-		mask : 9
-	});
-	car.shape2 = phys2D.createPolygonShape({
-		vertices : [[-217 / viewport.scale, 19.5 / viewport.scale], [-217 / viewport.scale, -12.5 / viewport.scale], [219 / viewport.scale, -12.5 / viewport.scale], [219 / viewport.scale, 19.5 / viewport.scale]],
-		group : 4,
-		mask : 9
-	});
-	// car.shape3 = phys2D.createPolygonShape({});
-	car.shape4 = phys2D.createPolygonShape({
-		vertices : [[70 / viewport.scale, -12.5 / viewport.scale], [70 / viewport.scale, -31.5 / viewport.scale], [185 / viewport.scale, -22 / viewport.scale], [185 / viewport.scale, -12.5 / viewport.scale]]
-	});
-	car.shape5 = phys2D.createPolygonShape({
-		vertices : [[-217 / viewport.scale, -12.5 / viewport.scale], [-217 / viewport.scale, -95.5 / viewport.scale], [40 / viewport.scale, -95.5 / viewport.scale], [40 / viewport.scale, -12.5 / viewport.scale]]
-	});
-	car.shape6 = phys2D.createPolygonShape({
-		vertices : [[40 / viewport.scale, -12.5 / viewport.scale], [40 / viewport.scale, -95.5 / viewport.scale], [70 / viewport.scale, -31.5 / viewport.scale], [70 / viewport.scale, -12.5 / viewport.scale]]
-	});
-	car.shape7 = phys2D.createPolygonShape({
-		vertices : [[-217 / viewport.scale, -95.5 / viewport.scale], [-217 / viewport.scale, -113.5 / viewport.scale], [8 / viewport.scale, -113.5 / viewport.scale], [8 / viewport.scale, -95.5 / viewport.scale]]
-	});
-	// car.shape8 = phys2D.createPolygonShape({});
-	car.wheelL = phys2D.createCircleShape({
-		radius : 50 / viewport.scale,
-		origin : [0, 0],
-		group : 4,
-		mask : 9
-	});
-	car.wheelL_rB = phys2D.createRigidBody({
-		type : 'dynamic',
-		shapes : [car.wheelL],
-		position : [viewport.m_width / 3, viewport.m_height / 2]
-	});
-	car.wheelR = phys2D.createCircleShape({
-		radius : 50 / viewport.scale,
-		origin : [0, 0],
-		group : 4,
-		mask : 9
-	});
-	car.wheelR_rB = phys2D.createRigidBody({
-		type : 'dynamic',
-		shapes : [car.wheelR],
-		position : [viewport.m_width / 3 * 2, viewport.m_height / 2]
-	});
-	car.rigidBody = phys2D.createRigidBody({
-		type : 'dynamic',
-		shapes : [car.shape1, car.shape2, car.shape4, car.shape5, car.shape6, car.shape7],
-		position : car.position
-	});
-	//constraints
-	car.aConstraint = phys2D.createAngleConstraint({
-		bodyA : car.wheelR_rB,
-		bodyB : car.wheelL_rB,
-		ratio : 1
-	});
-	car.dConstraint1 = phys2D.createDistanceConstraint({
-		bodyA : car.wheelL_rB,
-		bodyB : car.rigidBody,
-		anchorB : [-153 / viewport.scale, 0],
-		lowerBound : 80 / viewport.scale,
-		upperBound : 100 / viewport.scale
-	});
-	car.dConstraint2 = phys2D.createDistanceConstraint({
-		bodyA : car.wheelL_rB,
-		bodyB : car.rigidBody,
-		anchorB : [-113 / viewport.scale, 0],
-		lowerBound : 80 / viewport.scale,
-		upperBound : 100 / viewport.scale
-	});
-	car.dConstraint3 = phys2D.createDistanceConstraint({
-		bodyA : car.wheelR_rB,
-		bodyB : car.rigidBody,
-		anchorB : [143 / viewport.scale, 0],
-		lowerBound : 80 / viewport.scale,
-		upperBound : 100 / viewport.scale
-	});
-	car.dConstraint4 = phys2D.createDistanceConstraint({
-		bodyA : car.wheelR_rB,
-		bodyB : car.rigidBody,
-		anchorB : [183 / viewport.scale, 0],
-		lowerBound : 80 / viewport.scale,
-		upperBound : 100 / viewport.scale
-	});
-	car.lConstraint1 = phys2D.createLineConstraint({
-		bodyA : car.rigidBody,
-		bodyB : car.wheelL_rB,
-		axis : [0, 1],
-		anchorA : [-133 / viewport.scale, -12.5 / viewport.scale],
-		lowerBound : 1,
-		upperBound : 4
-	});
-	car.lConstraint2 = phys2D.createLineConstraint({
-		bodyA : car.rigidBody,
-		bodyB : car.wheelR_rB,
-		axis : [0, 1],
-		anchorA : [163 / viewport.scale, -12.5 / viewport.scale],
-		lowerBound : 1,
-		upperBound : 4
-	});
-	car.movement = 0;
-	/*
-	 * 0 -> not moving
-	 * 1 -> moving right
-	 * 2 -> moving left
-	 */
-	car.speed = 10;
-
-	world.addRigidBody(car.rigidBody);
-	world.addRigidBody(car.wheelL_rB);
-	world.addRigidBody(car.wheelR_rB);
-	world.addConstraint(car.aConstraint);
-	world.addConstraint(car.dConstraint1);
-	world.addConstraint(car.dConstraint2);
-	world.addConstraint(car.dConstraint3);
-	world.addConstraint(car.dConstraint4);
-	world.addConstraint(car.lConstraint1);
-	world.addConstraint(car.lConstraint2);
 
 	//===================================================
 	//   Draw2D                                         =
@@ -319,122 +95,81 @@ TurbulenzEngine.onload = function onLoadFn() {
 	//startup
 	var loadedItems = 0;
 
-	var layer0 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 1920,
-		height : 1080
-	});
-	var layer1 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : 1012,
-		width : 1920,
-		height : 136
-	});
-	var layer2 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : 396,
-		width : 1138,
-		height : 742
-	});
-	var layer3 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 1920,
-		height : 1080
-	});
+	var layer0, layer1, layer2, layer3, button1, car_body, car_wheel1, car_wheel2;
+	function draw2DItems() {
+		layer0 = Draw2DSprite.create({
+			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
+			textureRectangle : [0, 0, 1920, 1080],
+			origin : [1920 / 2, 1080 / 2],
+			x : viewport.px_width / 2,
+			y : viewport.px_height / 2,
+			width : 1920,
+			height : 1080
+		});
+		layer1 = Draw2DSprite.create({
+			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
+			textureRectangle : [0, 1080, 1920, 1216],
+			origin : [960, 68],
+			x : viewport.px_width / 2,
+			y : 1012,
+			width : 1920,
+			height : 136
+		});
+		layer2 = Draw2DSprite.create({
+			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
+			textureRectangle : [0, 1300, 1138, 2042],
+			x : viewport.px_width / 2,
+			y : 396,
+			width : 1138,
+			height : 742
+		});
+		layer3 = Draw2DSprite.create({
+			texture : textureManager.get("assets/Game1_sprite2_v1.png"),
+			textureRectangle : [0, 800, 1920, 1880],
+			x : viewport.px_width / 2,
+			y : viewport.px_height / 2,
+			width : 1920,
+			height : 1080
+		});
+		button1 = Draw2DSprite.create({
+			texture : textureManager.get("assets/Game1_sprite2_v1.png"),
+			textureRectangle : [0, 0, 730, 730],
+			x : viewport.px_width / 2,
+			y : viewport.px_height / 2,
+			width : 730,
+			height : 730
+		});
+		//TODO add rest of UI (menu)
 
-	var button1 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 730,
-		height : 730
-	});
-	//TODO add rest of UI (menu)
-
-	var car_body = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 444,
-		height : 190,
-		origin : [444 / 2, (190 / 2) + 30]
-	});
-	//TODO add custom car/color picker
-	var car_wheel1 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 100,
-		origin : [50, 50]
-	});
-	var car_wheel2 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 100,
-		origin : [50, 50]
-	});
-
-	var num1 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
-	var num2 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
-	var num3 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
-	var num4 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
-	var num5 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
-	var num6 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
-	var num7 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
-	var num8 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
-	var num9 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
-	var num0 = Draw2DSprite.create({
-		x : viewport.px_width / 2,
-		y : viewport.px_height / 2,
-		width : 100,
-		height : 140
-	});
+		car_body = Draw2DSprite.create({
+			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
+			textureRectangle : [1138, 1406, 1582, 1596],
+			x : viewport.px_width / 2,
+			y : viewport.px_height / 2,
+			width : 444,
+			height : 190,
+			origin : [444 / 2, (190 / 2) + 30]
+		});
+		//TODO add custom car/color picker
+		car_wheel1 = Draw2DSprite.create({
+			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
+			textureRectangle : [1920, 272, 2020, 372],
+			x : viewport.px_width / 2,
+			y : viewport.px_height / 2,
+			width : 100,
+			height : 100,
+			origin : [50, 50]
+		});
+		car_wheel2 = Draw2DSprite.create({
+			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
+			textureRectangle : [1920, 272, 2020, 372],
+			x : viewport.px_width / 2,
+			y : viewport.px_height / 2,
+			width : 100,
+			height : 100,
+			origin : [50, 50]
+		});
+	}
 
 	//===================================================
 	//   Sound                                          =
@@ -454,12 +189,8 @@ TurbulenzEngine.onload = function onLoadFn() {
 		looping : true
 	});
 
-	var playStartMusic = function playStartMusicFn() {
-		startMusicSource.play(startMusicSound);
-	};
-
 	//===================================================
-	//   Input Controls                                 =
+	//   Input                                          =
 	//===================================================
 	var inputDevice = TurbulenzEngine.createInputDevice({});
 	var keyCodes = inputDevice.keyCodes;
@@ -469,33 +200,64 @@ TurbulenzEngine.onload = function onLoadFn() {
 		if (keynum === keyCodes.RETURN) {
 			screen++;
 			console.log("Screen: " + screen);
-			console.log(carpos);
 		} else if (keynum === keyCodes.RIGHT || keynum === keyCodes.D) {
 			car.movement = 1;
 		} else if (keynum === keyCodes.LEFT || keynum === keyCodes.A) {
-			car.movement = 2;
+			car.movement = 2; //TODO remove left movement
 		} else if (keynum === keyCodes.UP) {
 			car.rigidBody.applyImpulse([0, -500]);
 			//TODO REMOVE
+		} else if (keynum === keyCodes.DOWN) {
+			startMusicSource.stop(startMusicSound);
 		}
 	};
 	inputDevice.addEventListener('keydown', onKeyDown);
 
 	var onKeyUp = this.onKeyUp = function onKeyUpFn(keynum) {
 		if (keynum === keyCodes.LEFT || keynum === keyCodes.A) {
-			//Stop LEFT
+			//Stop LEFT TODO remove left movement
 			car.movement = 0;
 		} else if (keynum === keyCodes.RIGHT || keynum === keyCodes.D) {
 			//Stop RIGHT
 			car.movement = 0;
 		} else if (keynum === keyCodes.R) {
-			car.rigidBody.setPosition([viewport.m_width / 2, viewport.m_height / 3]);
-		} else if (keynum === keyCodes.D) {
-			debugZeichnen = !debugZeichnen;
+			restart();
+			console.log("called restart");
 		}
 	};
-
 	inputDevice.addEventListener('keyup', onKeyUp);
+
+	var onMouseDown = function onMouseDownFn(mouseCode, x, y) {
+		if (mouseCode === mouseCodes.BUTTON_0 || mouseCodes.BUTTON_1) {
+			screen++;
+			console.log("Screen: " + screen);
+		}
+	};
+	inputDevice.addEventListener('mousedown', onMouseDown);
+
+	var loadAssets = function loadAssetsFn(mappingTable) {
+		//textures
+		textureManager.load("assets/Game1_sprite1_v2.0.png");
+		textureManager.load("assets/Game1_sprite2_v1.png");
+
+		//sound
+		var soundURL = mappingTable.getURL("assets/welcome.mp3");
+		soundDevice.createSound({
+			src : soundURL,
+			onload : function(sound) {
+				if (sound) {
+					startMusicSound = sound;
+				} else {
+					console.log("Failed to load sound...");
+				}
+				loadedItems++;
+			}
+		});
+	};
+
+	var playStartMusic = function playStartMusicFn() {
+		startMusicSource.play(startMusicSound);
+	};
 
 	//===================================================
 	//   Main Loop                                      =
@@ -503,8 +265,16 @@ TurbulenzEngine.onload = function onLoadFn() {
 	var realTime = 0;
 	var prevTime = TurbulenzEngine.time;
 
+	// var draw2DViewportRectangle = [viewport.x + 510, viewport.y, viewport.px_width + 510, viewport.px_height];
+	// var physicsDebugViewport = [(viewport.x / 30) + 17, viewport.y / 30, viewport.m_width + 17, viewport.m_height];
+// 	
+	var draw2DViewportRectangle = [viewport.x, viewport.y, viewport.px_width, viewport.px_height];
+	var physicsDebugViewport = [(viewport.x / 30), viewport.y / 30, viewport.m_width, viewport.m_height];
+
 	function mainLoop() {
 		//Tick Tock Tick Tock...
+		var carpos_old = car.rigidBody.getPosition();
+
 		var curTime = TurbulenzEngine.time;
 		var timeDelta = (curTime - prevTime);
 		if (timeDelta > (1 / 20)) {
@@ -512,6 +282,9 @@ TurbulenzEngine.onload = function onLoadFn() {
 		}
 		realTime += timeDelta;
 		prevTime = curTime;
+
+		//var xOffsetDelta_px = timeDelta * 100;
+		//var xOffsetDelta_m = xOffsetDelta_px / 30;
 
 		soundDevice.update();
 		inputDevice.update();
@@ -527,11 +300,31 @@ TurbulenzEngine.onload = function onLoadFn() {
 			carL = car.wheelL_rB.getPosition();
 			carR = car.wheelR_rB.getPosition();
 
+			//calc car position to draw (side-scrolling effect)
+			var xOffsetDelta_m = carpos[0] - carpos_old[0];
+			var xOffsetDelta_px = xOffsetDelta_m * 30;
+			// var yOffsetDelta_m = carpos[1] - carpos_old[1];
+			// var yOffsetDelta_px = xOffsetDelta_m * 30;
+			draw2DViewportRectangle[0] += xOffsetDelta_px;
+			// draw2DViewportRectangle[1] += yOffsetDelta_px;
+			draw2DViewportRectangle[2] += xOffsetDelta_px;
+			// draw2DViewportRectangle[3] += yOffsetDelta_px;
+			physicsDebugViewport[0] += xOffsetDelta_m;
+			// physicsDebugViewport[1] += yOffsetDelta_m;
+			physicsDebugViewport[2] += xOffsetDelta_m;
+			// physicsDebugViewport[3] += yOffsetDelta_m;
+
+			draw2D.configure({
+				viewportRectangle : draw2DViewportRectangle,
+				scaleMode : 'scale'
+			});
+			p_debug.setPhysics2DViewport(physicsDebugViewport);
+
 			p_debug.setScreenViewport(draw2D.getScreenSpaceViewport());
-			// p_debug.setPhysics2DViewport([viewport.x, viewport.y, viewport.m_width, viewport.m_height]);
 			p_debug.begin();
 			p_debug.drawWorld(world);
 
+			//Draw2D Sprite Placement
 			car_body.x = carpos[0] * 30;
 			car_body.y = carpos[1] * 30;
 			car_body.rotation = car.rigidBody.getRotation();
@@ -542,46 +335,39 @@ TurbulenzEngine.onload = function onLoadFn() {
 			car_wheel2.y = carR[1] * 30;
 			car_wheel2.rotation = car.wheelR_rB.getRotation();
 
-			if (carpos[0] > (1920 / 30)) {
-				console.log("JETZT");
-			}
-
 			p_debug.end();
+
+			//Dra2D Sprite Drawing
 			draw2D.begin('alpha');
 			draw2D.drawSprite(car_body);
 			draw2D.drawSprite(car_wheel1);
 			draw2D.drawSprite(car_wheel2);
 			draw2D.end();
 
-			if (debugZeichnen) {
-				p_debug.showConstraints = true;
-				p_debug.showRigidBodies = true;
-			} else {
-				p_debug.showConstraints = false;
-				p_debug.showRigidBodies = false;
-			}
-
-			//Auto bewegen
+			//Move car
 			if (car.movement === 1) {
-				//rechts
-				if (car.speed < 30) {
+				//right
+				if (car.speed < 50) {
 					car.speed++;
 				}
 				car.rigidBody.applyImpulse([car.speed, 0]);
 			}
 			if (car.movement === 2) {
-				//links
-				if (car.speed < 30) {
+				//left
+				if (car.speed < 50) {
 					car.speed++;
 				}
 				car.rigidBody.applyImpulse([-car.speed, 0]);
 			}
 			if (car.movement === 0) {
-				car.speed = 10;
+				car.speed = 15;
+			}
+			
+			if(carpos[0] > 500) {
+				restart();
 			}
 
 			graphicsDevice.endFrame();
-
 		}
 	}
 
@@ -591,7 +377,11 @@ TurbulenzEngine.onload = function onLoadFn() {
 			TurbulenzEngine.clearInterval(intervalID);
 		}
 
-		//TODO clean everything
+		//TODO clean
+		world.removeRigidBody(car.rigidBody);
+		world.removeRigidBody(car.wheelL_rB);
+		world.removeRigidBody(car.wheelR_rB);
+		world.removeRigidBody(cool_floor.rB);
 	};
 
 	TurbulenzEngine.onerror = function gameErrorFn(msg) {
@@ -605,7 +395,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 		}
 
 		playStartMusic();
-		//TODO turn music on/off
+		//TODO turn music on/off SWITCH
 
 		soundDevice.update();
 		inputDevice.update();
@@ -644,7 +434,8 @@ TurbulenzEngine.onload = function onLoadFn() {
 				draw2D.end();
 			} else if (screen === 4) {
 				//Load level
-
+				createDefaultLevel();
+				createCar();
 				TurbulenzEngine.clearInterval(intervalID);
 				intervalID = TurbulenzEngine.setInterval(mainLoop, 1000 / 60);
 			}
@@ -654,13 +445,202 @@ TurbulenzEngine.onload = function onLoadFn() {
 	}
 
 	function load() {
-		if (loadedItems === 3) {
+		if (loadedItems === 1 && textureManager.getNumPendingTextures() === 0) {
+			screen = 1;
+			draw2DItems();
 			TurbulenzEngine.clearInterval(intervalID);
 			intervalID = TurbulenzEngine.setInterval(menu, 1000 / 60);
 		}
 	}
 
-	//intervalID = TurbulenzEngine.setInterval(mainLoop, 1000 / 60);
-	//TODO change. just debuging
+	//================================================================
+	//===== Functions                                            =====
+	//================================================================
+	//Physics
+	function createDefaultLevel() {
+		cool_floor = {
+			width : 2000 / viewport.scale,
+			height : 1080 / viewport.scale,
+			position : [0, 1080 / viewport.scale]
+		};
+		cool_floor.shape0 = phys2D.createPolygonShape({
+			vertices : [[-100 / viewport.scale, 0], [-100 / viewport.scale, -1080 / viewport.scale], [0, -1080 / viewport.scale], [0, 0]]
+		});
+		cool_floor.shape1 = phys2D.createPolygonShape({
+			vertices : [[0, 0], [0, -400 / viewport.scale], [200 / viewport.scale, -400 / viewport.scale], [200 / viewport.scale, 0]]
+		});
+		cool_floor.shape2 = phys2D.createPolygonShape({
+			vertices : [[200 / viewport.scale, -300 / viewport.scale], [200 / viewport.scale, -400 / viewport.scale], [400 / viewport.scale, -300 / viewport.scale]]
+		});
+		cool_floor.shape3 = phys2D.createPolygonShape({
+			vertices : [[400 / viewport.scale, -200 / viewport.scale], [400 / viewport.scale, -300 / viewport.scale], [800 / viewport.scale, -300 / viewport.scale], [800 / viewport.scale, -200 / viewport.scale]]
+		});
+		cool_floor.shape4 = phys2D.createPolygonShape({
+			vertices : [[800 / viewport.scale, -300 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale]]
+		});
+		cool_floor.shape5 = phys2D.createPolygonShape({
+			vertices : [[1200 / viewport.scale, -50 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale], [2000 / viewport.scale, -50 / viewport.scale]]
+		});
+		cool_floor.shape6 = phys2D.createPolygonShape({
+			vertices: [[2000/viewport.scale, 0], [2000/viewport.scale, -50/viewport.scale], [3500/viewport.scale, -50/viewport.scale], [3500/viewport.scale, 0]]
+		});
+		cool_floor.shape7 = phys2D.createPolygonShape({
+			vertices: [[3500/viewport.scale, -50/viewport.scale], [5000/viewport.scale, -420/viewport.scale], [5000/viewport.scale, -50/viewport.scale]]
+		});
+		cool_floor.shape8 = phys2D.createPolygonShape({
+			vertices: [[5000/viewport.scale, 0], [5000/viewport.scale, -50/viewport.scale], [20000/viewport.scale, -50/viewport.scale], [20000/viewport.scale, 0]]
+		});
+		cool_floor.shape9 = phys2D.createPolygonShape({
+			vertices: [[20000/viewport.scale, 0], [20000/viewport.scale, -1080/viewport.scale], [20100/viewport.scale, -1080/viewport.scale], [20100/viewport.scale, 0]]
+		});
+		cool_floor.rB = phys2D.createRigidBody({
+			type : 'static',
+			shapes : [cool_floor.shape0, cool_floor.shape1, cool_floor.shape2, cool_floor.shape3, cool_floor.shape4, cool_floor.shape5, cool_floor.shape6, cool_floor.shape7, cool_floor.shape8, cool_floor.shape9],
+			position : cool_floor.position
+		});
+		world.addRigidBody(cool_floor.rB);
+	}
+
+	function createCar() {
+		//car
+		car = {
+			position : [15, viewport.m_height / 3]
+		};
+		car.shape1 = phys2D.createPolygonShape({
+			vertices : [[-217 / viewport.scale, 69.5 / viewport.scale], [-217 / viewport.scale, 19.5 / viewport.scale], [140 / viewport.scale, 19.5 / viewport.scale], [140 / viewport.scale, 69.5 / viewport.scale]],
+			group : 4,
+			mask : 9
+		});
+		car.shape2 = phys2D.createPolygonShape({
+			vertices : [[-217 / viewport.scale, 19.5 / viewport.scale], [-217 / viewport.scale, -12.5 / viewport.scale], [219 / viewport.scale, -12.5 / viewport.scale], [219 / viewport.scale, 19.5 / viewport.scale]],
+			group : 4,
+			mask : 9
+		});
+		// car.shape3 = phys2D.createPolygonShape({}); removed cause unnecessary
+		car.shape4 = phys2D.createPolygonShape({
+			vertices : [[70 / viewport.scale, -12.5 / viewport.scale], [70 / viewport.scale, -31.5 / viewport.scale], [185 / viewport.scale, -22 / viewport.scale], [185 / viewport.scale, -12.5 / viewport.scale]]
+		});
+		car.shape5 = phys2D.createPolygonShape({
+			vertices : [[-217 / viewport.scale, -12.5 / viewport.scale], [-217 / viewport.scale, -95.5 / viewport.scale], [40 / viewport.scale, -95.5 / viewport.scale], [40 / viewport.scale, -12.5 / viewport.scale]]
+		});
+		car.shape6 = phys2D.createPolygonShape({
+			vertices : [[40 / viewport.scale, -12.5 / viewport.scale], [40 / viewport.scale, -95.5 / viewport.scale], [70 / viewport.scale, -31.5 / viewport.scale], [70 / viewport.scale, -12.5 / viewport.scale]]
+		});
+		car.shape7 = phys2D.createPolygonShape({
+			vertices : [[-217 / viewport.scale, -95.5 / viewport.scale], [-217 / viewport.scale, -113.5 / viewport.scale], [8 / viewport.scale, -113.5 / viewport.scale], [8 / viewport.scale, -95.5 / viewport.scale]]
+		});
+		// car.shape8 = phys2D.createPolygonShape({}); removed cause unnecessary
+		car.wheelL = phys2D.createCircleShape({
+			radius : 50 / viewport.scale,
+			origin : [0, 0],
+			group : 4,
+			mask : 9
+		});
+		car.wheelL_rB = phys2D.createRigidBody({
+			type : 'dynamic',
+			shapes : [car.wheelL],
+			position : [viewport.m_width / 3, viewport.m_height / 2]
+		});
+		car.wheelR = phys2D.createCircleShape({
+			radius : 50 / viewport.scale,
+			origin : [0, 0],
+			group : 4,
+			mask : 9
+		});
+		car.wheelR_rB = phys2D.createRigidBody({
+			type : 'dynamic',
+			shapes : [car.wheelR],
+			position : [viewport.m_width / 3 * 2, viewport.m_height / 2]
+		});
+		car.rigidBody = phys2D.createRigidBody({
+			type : 'dynamic',
+			shapes : [car.shape1, car.shape2, car.shape4, car.shape5, car.shape6, car.shape7],
+			position : car.position
+		});
+		//constraints
+		car.aConstraint = phys2D.createAngleConstraint({
+			bodyA : car.wheelR_rB,
+			bodyB : car.wheelL_rB,
+			ratio : 1
+		});
+		car.dConstraint1 = phys2D.createDistanceConstraint({
+			bodyA : car.wheelL_rB,
+			bodyB : car.rigidBody,
+			anchorB : [-153 / viewport.scale, 0],
+			lowerBound : 80 / viewport.scale,
+			upperBound : 100 / viewport.scale
+		});
+		car.dConstraint2 = phys2D.createDistanceConstraint({
+			bodyA : car.wheelL_rB,
+			bodyB : car.rigidBody,
+			anchorB : [-113 / viewport.scale, 0],
+			lowerBound : 80 / viewport.scale,
+			upperBound : 100 / viewport.scale
+		});
+		car.dConstraint3 = phys2D.createDistanceConstraint({
+			bodyA : car.wheelR_rB,
+			bodyB : car.rigidBody,
+			anchorB : [143 / viewport.scale, 0],
+			lowerBound : 80 / viewport.scale,
+			upperBound : 100 / viewport.scale
+		});
+		car.dConstraint4 = phys2D.createDistanceConstraint({
+			bodyA : car.wheelR_rB,
+			bodyB : car.rigidBody,
+			anchorB : [183 / viewport.scale, 0],
+			lowerBound : 80 / viewport.scale,
+			upperBound : 100 / viewport.scale
+		});
+		car.lConstraint1 = phys2D.createLineConstraint({
+			bodyA : car.rigidBody,
+			bodyB : car.wheelL_rB,
+			axis : [0, 1],
+			anchorA : [-133 / viewport.scale, -12.5 / viewport.scale],
+			lowerBound : 1,
+			upperBound : 4
+		});
+		car.lConstraint2 = phys2D.createLineConstraint({
+			bodyA : car.rigidBody,
+			bodyB : car.wheelR_rB,
+			axis : [0, 1],
+			anchorA : [163 / viewport.scale, -12.5 / viewport.scale],
+			lowerBound : 1,
+			upperBound : 4
+		});
+		car.movement = 0;
+		/*
+		 * 0 -> not moving
+		 * 1 -> moving right
+		 * 2 -> moving left
+		 */
+		car.speed = 10;
+
+		world.addRigidBody(car.rigidBody);
+		world.addRigidBody(car.wheelL_rB);
+		world.addRigidBody(car.wheelR_rB);
+		world.addConstraint(car.aConstraint);
+		world.addConstraint(car.dConstraint1);
+		world.addConstraint(car.dConstraint2);
+		world.addConstraint(car.dConstraint3);
+		world.addConstraint(car.dConstraint4);
+		world.addConstraint(car.lConstraint1);
+		world.addConstraint(car.lConstraint2);
+	}
+
+	function restart() {
+		//Remove
+		world.removeRigidBody(car.rigidBody);
+		world.removeRigidBody(car.wheelL_rB);
+		world.removeRigidBody(car.wheelR_rB);
+		world.removeRigidBody(cool_floor.rB);
+		//create custom world unloading
+
+		//Build
+		draw2DViewportRectangle = [viewport.x, viewport.y, viewport.px_width, viewport.px_height];
+		physicsDebugViewport = [viewport.x / 30, viewport.y / 30, viewport.m_width, viewport.m_height];
+		createDefaultLevel();
+		createCar();
+	}
+
 	intervalID = TurbulenzEngine.setInterval(load, 1000 / 60);
 };

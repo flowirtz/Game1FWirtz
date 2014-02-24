@@ -1,148 +1,22 @@
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
-    <title>
-        game1
-    </title>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-    <style type="text/css">
-html, body, div, span, object, iframe, h1, h2, p, a, img, ul, li, fieldset, form, label, legend, table, thead, tbody, tfoot, tr, th, td {
-    border: 0;
-    font-size: 100%;
-    margin: 0;
-    outline: 0;
-    padding: 0;
-    vertical-align: baseline;
-}
-    </style>
-    <!-- block tz_app_header -->
-    
-    <!-- end tz_app_header -->
-</head>
-<body style="background:#B4B4B4;font:normal normal normal 13px/1.231 Helvetica,Arial,sans-serif;text-shadow:1px 1px #F9F8F8;">
-    <div id="titlebar" style="position:fixed;height:65px;top:0;right:0;left:0;">
-        <strong style="font-size:24px;line-height:64px;margin:16px;">
-            <!-- block tz_app_title_name -->
-            
-            game1
-            
-            <!-- end tz_app_title_name -->
-        </strong>
-        <div id="titlelogo"
-             style="float:right;width:27px;height:27px;margin:18px 24px;">
-        </div>
-    </div>
-    <div id="sidebar"
-         style="background:#B4B4B4;position:fixed;width:303px;top:65px;left:0;">
-        <!-- block tz_app_html_controls -->
-        
-        
-        <!-- end tz_app_html_controls -->
-    </div>
-    <div id="engine" style="background:#939393;position:fixed;top:65px;
-                            bottom:0;right:0;left:303px;
-                            border-left:1px solid #898989;">
-        <!--
-          HTML to create a plugin or canvas instance.
-          Supplied by 'tz_engine_div' variable.
-        -->
-        
-        <canvas id="turbulenz_game_engine_canvas" moz-opaque="true" tabindex="1">
-            Sorry, but your browser does not support WebGL or does not have it
-            enabled.  To get a WebGL-enabled browser, please see:<br/>
-            <a href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" target="_blank">
-                Getting a WebGL Implementation
-            </a>
-        </canvas>
-
-        <script type="text/javascript">
-            var canvasSupported = true;
-            (function()
-            {
-                var contextNames = ["webgl", "experimental-webgl"];
-                var context = null;
-                var canvas = document.createElement('canvas');
-
-                document.body.appendChild(canvas);
-
-                for (var i = 0; i < contextNames.length; i += 1)
-                {
-                    try {
-                        context = canvas.getContext(contextNames[i]);
-                    } catch (e) {}
-
-                    if (context) {
-                        break;
-                    }
-                }
-                if (!context)
-                {
-                    canvasSupported = false;
-                    window.alert("Sorry, but your browser does not support WebGL or does not have it enabled.");
-                }
-
-                document.body.removeChild(canvas);
-            }());
-            var TurbulenzEngine = {};
-        </script>
-    </div>
-
-    <!-- begin 'tz_include_js' variable -->
-    <script type="text/javascript" src="jslib/debug.js"></script>
-<script type="text/javascript" src="jslib/vmath.js"></script>
-<script type="text/javascript" src="jslib/utilities.js"></script>
-<script type="text/javascript" src="jslib/aabbtree.js"></script>
-<script type="text/javascript" src="jslib/observer.js"></script>
-<script type="text/javascript" src="jslib/webgl/ddsloader.js"></script>
-<script type="text/javascript" src="jslib/webgl/graphicsdevice.js"></script>
-<script type="text/javascript" src="jslib/webgl/inputdevice.js"></script>
-<script type="text/javascript" src="jslib/webgl/mathdevice.js"></script>
-<script type="text/javascript" src="jslib/webgl/networkdevice.js"></script>
-<script type="text/javascript" src="jslib/webgl/physicsdevice.js"></script>
-<script type="text/javascript" src="jslib/webgl/sounddevice.js"></script>
-<script type="text/javascript" src="jslib/webgl/soundtarloader.js"></script>
-<script type="text/javascript" src="jslib/webgl/tarloader.js"></script>
-<script type="text/javascript" src="jslib/webgl/tgaloader.js"></script>
-<script type="text/javascript" src="jslib/webgl/touch.js"></script>
-<script type="text/javascript" src="jslib/webgl/touchevent.js"></script>
-<script type="text/javascript" src="jslib/webgl/turbulenzengine.js"></script>
-<script type="text/javascript" src="jslib/draw2d.js"></script>
-<script type="text/javascript" src="jslib/requesthandler.js"></script>
-<script type="text/javascript" src="jslib/services/turbulenzservices.js"></script>
-<script type="text/javascript" src="jslib/services/turbulenzbridge.js"></script>
-<script type="text/javascript" src="jslib/services/gamesession.js"></script>
-<script type="text/javascript" src="jslib/physics2ddevice.js"></script>
-<script type="text/javascript" src="jslib/physics2ddebugdraw.js"></script>
-<script type="text/javascript" src="jslib/boxtree.js"></script>
-<script type="text/javascript" src="jslib/services/mappingtable.js"></script>
-<script type="text/javascript" src="jslib/texturemanager.js"></script>
-    <!-- end 'tz_include_js' variable -->
-
-    <script type="text/javascript">
-      // ----------------------------------------
-      // Embedded code and startup code.
-      // Supplied by 'tz_startup_code' variable.
-      // ----------------------------------------
-      
+/*{# Copyright (c) 2014 Florian Wirtz #}*/
 /*
  * @title: Game 1
  * @description:
  * version 012alpha
  */
 
-
-
-
-
-
-
-
-
-
-
-
-
+/*{{ javascript("jslib/draw2d.js") }}*/
+/*{{ javascript("jslib/utilities.js") }}*/
+/*{{ javascript("jslib/requesthandler.js") }}*/
+/*{{ javascript("jslib/services/turbulenzservices.js") }}*/
+/*{{ javascript("jslib/services/turbulenzbridge.js") }}*/
+/*{{ javascript("jslib/services/gamesession.js") }}*/
+/*{{ javascript("jslib/physics2ddevice.js") }}*/
+/*{{ javascript("jslib/physics2ddebugdraw.js") }}*/
+/*{{ javascript("jslib/boxtree.js") }}*/
+/*{{ javascript("jslib/services/mappingtable.js") }}*/
+/*{{ javascript("jslib/texturemanager.js") }}*/
+/*{{ javascript("jslib/observer.js") }}*/
 
 TurbulenzEngine.onload = function onLoadFn() {
 	//===================================================
@@ -157,7 +31,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 	var carL = null;
 	var carR = null;
 	var startMusicSound = null;
-
+	
 	var errorCallback = function errorCallbackFn(msg) {
 		window.alert(msg);
 	};
@@ -221,81 +95,79 @@ TurbulenzEngine.onload = function onLoadFn() {
 	//startup
 	var loadedItems = 0;
 
-	var layer0, layer1, layer2, layer3, button1, car_body, car_wheel1, car_wheel2;
-	function draw2DItems() {
-		layer0 = Draw2DSprite.create({
-			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
-			textureRectangle : [0, 0, 1920, 1080],
-			origin : [1920 / 2, 1080 / 2],
-			x : viewport.px_width / 2,
-			y : viewport.px_height / 2,
-			width : 1920,
-			height : 1080
-		});
-		layer1 = Draw2DSprite.create({
-			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
-			textureRectangle : [0, 1080, 1920, 1216],
-			origin : [960, 68],
-			x : viewport.px_width / 2,
-			y : 1012,
-			width : 1920,
-			height : 136
-		});
-		layer2 = Draw2DSprite.create({
-			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
-			textureRectangle : [0, 1300, 1138, 2042],
-			x : viewport.px_width / 2,
-			y : 396,
-			width : 1138,
-			height : 742
-		});
-		layer3 = Draw2DSprite.create({
-			texture : textureManager.get("assets/Game1_sprite2_v1.png"),
-			textureRectangle : [0, 800, 1920, 1880],
-			x : viewport.px_width / 2,
-			y : viewport.px_height / 2,
-			width : 1920,
-			height : 1080
-		});
-		button1 = Draw2DSprite.create({
-			texture : textureManager.get("assets/Game1_sprite2_v1.png"),
-			textureRectangle : [0, 0, 730, 730],
-			x : viewport.px_width / 2,
-			y : viewport.px_height / 2,
-			width : 730,
-			height : 730
-		});
-		//TODO add rest of UI (menu)
+	var layer0 = Draw2DSprite.create({
+		texture: textureManager.get("assets/Game1_sprite1_v2.0.png"),
+		textureRectangle: [0, 0, 1920, 1080],
+		origin: [1920 / 2, 1080 / 2],
+		x : viewport.px_width / 2,
+		y : viewport.px_height / 2,
+		width : 1920,
+		height : 1080
+	});
+	var layer1 = Draw2DSprite.create({
+		texture: textureManager.get("assets/Game1_sprite1_v2.0.png"),
+		textureRectangle: [0, 1080, 1920, 1216],
+		origin: [960, 68],
+		x : viewport.px_width / 2,
+		y : 1012,
+		width : 1920,
+		height : 136
+	});
+	var layer2 = Draw2DSprite.create({
+		texture: textureManager.get("assets/Game1_sprite1_v2.0.png"),
+		textureRectangle: [0, 1300, 1138, 2042],
+		x : viewport.px_width / 2,
+		y : 396,
+		width : 1138,
+		height : 742
+	});
+	var layer3 = Draw2DSprite.create({
+		texture: textureManager.get("assets/Game1_sprite2_v1.png"),
+		textureRectangle: [0, 800, 1920, 1880],
+		x : viewport.px_width / 2,
+		y : viewport.px_height / 2,
+		width : 1920,
+		height : 1080
+	});
 
-		car_body = Draw2DSprite.create({
-			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
-			textureRectangle : [1138, 1406, 1582, 1596],
-			x : viewport.px_width / 2,
-			y : viewport.px_height / 2,
-			width : 444,
-			height : 190,
-			origin : [444 / 2, (190 / 2) + 30]
-		});
-		//TODO add custom car/color picker
-		car_wheel1 = Draw2DSprite.create({
-			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
-			textureRectangle : [1920, 272, 2020, 372],
-			x : viewport.px_width / 2,
-			y : viewport.px_height / 2,
-			width : 100,
-			height : 100,
-			origin : [50, 50]
-		});
-		car_wheel2 = Draw2DSprite.create({
-			texture : textureManager.get("assets/Game1_sprite1_v2.0.png"),
-			textureRectangle : [1920, 272, 2020, 372],
-			x : viewport.px_width / 2,
-			y : viewport.px_height / 2,
-			width : 100,
-			height : 100,
-			origin : [50, 50]
-		});
-	}
+	var button1 = Draw2DSprite.create({
+		texture: textureManager.get("assets/Game1_sprite2_v1.png"),
+		textureRectangle: [0, 0, 730, 730],
+		x : viewport.px_width / 2,
+		y : viewport.px_height / 2,
+		width : 730,
+		height : 730
+	});
+	//TODO add rest of UI (menu)
+
+	var car_body = Draw2DSprite.create({
+		texture: textureManager.get("assets/Game1_sprite1_v2.0.png"),
+		textureRectangle: [1138, 1406, 1582, 1596],
+		x : viewport.px_width / 2,
+		y : viewport.px_height / 2,
+		width : 444,
+		height : 190,
+		origin : [444 / 2, (190 / 2) + 30]
+	});
+	//TODO add custom car/color picker
+	var car_wheel1 = Draw2DSprite.create({
+		texture: textureManager.get("assets/Game1_sprite1_v2.0.png"),
+		textureRectangle: [1920, 272, 2020, 372],
+		x : viewport.px_width / 2,
+		y : viewport.px_height / 2,
+		width : 100,
+		height : 100,
+		origin : [50, 50]
+	});
+	var car_wheel2 = Draw2DSprite.create({
+		texture: textureManager.get("assets/Game1_sprite1_v2.0.png"),
+		textureRectangle: [1920, 272, 2020, 372],
+		x : viewport.px_width / 2,
+		y : viewport.px_height / 2,
+		width : 100,
+		height : 100,
+		origin : [50, 50]
+	});
 
 	//===================================================
 	//   Sound                                          =
@@ -329,7 +201,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 		} else if (keynum === keyCodes.RIGHT || keynum === keyCodes.D) {
 			car.movement = 1;
 		} else if (keynum === keyCodes.LEFT || keynum === keyCodes.A) {
-			car.movement = 2; //TODO remove left movement
+			car.movement = 2;
 		} else if (keynum === keyCodes.UP) {
 			car.rigidBody.applyImpulse([0, -500]);
 			//TODO REMOVE
@@ -341,7 +213,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 
 	var onKeyUp = this.onKeyUp = function onKeyUpFn(keynum) {
 		if (keynum === keyCodes.LEFT || keynum === keyCodes.A) {
-			//Stop LEFT TODO remove left movement
+			//Stop LEFT
 			car.movement = 0;
 		} else if (keynum === keyCodes.RIGHT || keynum === keyCodes.D) {
 			//Stop RIGHT
@@ -363,8 +235,13 @@ TurbulenzEngine.onload = function onLoadFn() {
 
 	var loadAssets = function loadAssetsFn(mappingTable) {
 		//textures
-		textureManager.load("assets/Game1_sprite1_v2.0.png");
-		textureManager.load("assets/Game1_sprite2_v1.png");
+		textureManager.load("assets/Game1_sprite1_v2.0.png", false, texLoaded);
+		textureManager.load("assets/Game1_sprite2_v1.png", false, texLoaded);
+		
+		var texLoaded = function texLoadedFn() {
+			loadedItems++;
+		};
+        //TODO PLATZHALTER ===============================================================================================================================
 
 		//sound
 		var soundURL = mappingTable.getURL("assets/welcome.mp3");
@@ -379,6 +256,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 				loadedItems++;
 			}
 		});
+		loadedItems = 3;
 	};
 
 	var playStartMusic = function playStartMusicFn() {
@@ -391,16 +269,8 @@ TurbulenzEngine.onload = function onLoadFn() {
 	var realTime = 0;
 	var prevTime = TurbulenzEngine.time;
 
-	// var draw2DViewportRectangle = [viewport.x + 510, viewport.y, viewport.px_width + 510, viewport.px_height];
-	// var physicsDebugViewport = [(viewport.x / 30) + 17, viewport.y / 30, viewport.m_width + 17, viewport.m_height];
-// 	
-	var draw2DViewportRectangle = [viewport.x, viewport.y, viewport.px_width, viewport.px_height];
-	var physicsDebugViewport = [(viewport.x / 30), viewport.y / 30, viewport.m_width, viewport.m_height];
-
-	function mainLoop() {
+	function mainLoop() {	
 		//Tick Tock Tick Tock...
-		var carpos_old = car.rigidBody.getPosition();
-
 		var curTime = TurbulenzEngine.time;
 		var timeDelta = (curTime - prevTime);
 		if (timeDelta > (1 / 20)) {
@@ -408,9 +278,6 @@ TurbulenzEngine.onload = function onLoadFn() {
 		}
 		realTime += timeDelta;
 		prevTime = curTime;
-
-		//var xOffsetDelta_px = timeDelta * 100;
-		//var xOffsetDelta_m = xOffsetDelta_px / 30;
 
 		soundDevice.update();
 		inputDevice.update();
@@ -426,31 +293,11 @@ TurbulenzEngine.onload = function onLoadFn() {
 			carL = car.wheelL_rB.getPosition();
 			carR = car.wheelR_rB.getPosition();
 
-			//calc car position to draw (side-scrolling effect)
-			var xOffsetDelta_m = carpos[0] - carpos_old[0];
-			var xOffsetDelta_px = xOffsetDelta_m * 30;
-			// var yOffsetDelta_m = carpos[1] - carpos_old[1];
-			// var yOffsetDelta_px = xOffsetDelta_m * 30;
-			draw2DViewportRectangle[0] += xOffsetDelta_px;
-			// draw2DViewportRectangle[1] += yOffsetDelta_px;
-			draw2DViewportRectangle[2] += xOffsetDelta_px;
-			// draw2DViewportRectangle[3] += yOffsetDelta_px;
-			physicsDebugViewport[0] += xOffsetDelta_m;
-			// physicsDebugViewport[1] += yOffsetDelta_m;
-			physicsDebugViewport[2] += xOffsetDelta_m;
-			// physicsDebugViewport[3] += yOffsetDelta_m;
-
-			draw2D.configure({
-				viewportRectangle : draw2DViewportRectangle,
-				scaleMode : 'scale'
-			});
-			p_debug.setPhysics2DViewport(physicsDebugViewport);
-
 			p_debug.setScreenViewport(draw2D.getScreenSpaceViewport());
+			// p_debug.setPhysics2DViewport([viewport.x, viewport.y, viewport.m_width, viewport.m_height]);
 			p_debug.begin();
 			p_debug.drawWorld(world);
 
-			//Draw2D Sprite Placement
 			car_body.x = carpos[0] * 30;
 			car_body.y = carpos[1] * 30;
 			car_body.rotation = car.rigidBody.getRotation();
@@ -461,25 +308,27 @@ TurbulenzEngine.onload = function onLoadFn() {
 			car_wheel2.y = carR[1] * 30;
 			car_wheel2.rotation = car.wheelR_rB.getRotation();
 
-			p_debug.end();
+			if (carpos[0] > (1920 / 30)) {
+				console.log("JETZT");
+			}
 
-			//Dra2D Sprite Drawing
+			p_debug.end();
 			draw2D.begin('alpha');
 			draw2D.drawSprite(car_body);
 			draw2D.drawSprite(car_wheel1);
 			draw2D.drawSprite(car_wheel2);
 			draw2D.end();
 
-			//Move car
+			//Auto bewegen
 			if (car.movement === 1) {
-				//right
+				//rechts
 				if (car.speed < 50) {
 					car.speed++;
 				}
 				car.rigidBody.applyImpulse([car.speed, 0]);
 			}
 			if (car.movement === 2) {
-				//left
+				//links
 				if (car.speed < 50) {
 					car.speed++;
 				}
@@ -487,10 +336,6 @@ TurbulenzEngine.onload = function onLoadFn() {
 			}
 			if (car.movement === 0) {
 				car.speed = 15;
-			}
-			
-			if(carpos[0] > 500) {
-				restart();
 			}
 
 			graphicsDevice.endFrame();
@@ -503,11 +348,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 			TurbulenzEngine.clearInterval(intervalID);
 		}
 
-		//TODO clean
-		world.removeRigidBody(car.rigidBody);
-		world.removeRigidBody(car.wheelL_rB);
-		world.removeRigidBody(car.wheelR_rB);
-		world.removeRigidBody(cool_floor.rB);
+		//TODO clean everything
 	};
 
 	TurbulenzEngine.onerror = function gameErrorFn(msg) {
@@ -521,7 +362,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 		}
 
 		playStartMusic();
-		//TODO turn music on/off SWITCH
+		//TODO turn music on/off
 
 		soundDevice.update();
 		inputDevice.update();
@@ -571,9 +412,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 	}
 
 	function load() {
-		if (loadedItems === 1 && textureManager.getNumPendingTextures() === 0) {
-			screen = 1;
-			draw2DItems();
+		if (loadedItems === 3) {
 			TurbulenzEngine.clearInterval(intervalID);
 			intervalID = TurbulenzEngine.setInterval(menu, 1000 / 60);
 		}
@@ -589,9 +428,6 @@ TurbulenzEngine.onload = function onLoadFn() {
 			height : 1080 / viewport.scale,
 			position : [0, 1080 / viewport.scale]
 		};
-		cool_floor.shape0 = phys2D.createPolygonShape({
-			vertices : [[-100 / viewport.scale, 0], [-100 / viewport.scale, -1080 / viewport.scale], [0, -1080 / viewport.scale], [0, 0]]
-		});
 		cool_floor.shape1 = phys2D.createPolygonShape({
 			vertices : [[0, 0], [0, -400 / viewport.scale], [200 / viewport.scale, -400 / viewport.scale], [200 / viewport.scale, 0]]
 		});
@@ -605,23 +441,11 @@ TurbulenzEngine.onload = function onLoadFn() {
 			vertices : [[800 / viewport.scale, -300 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale]]
 		});
 		cool_floor.shape5 = phys2D.createPolygonShape({
-			vertices : [[1200 / viewport.scale, -50 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale], [2000 / viewport.scale, -50 / viewport.scale]]
-		});
-		cool_floor.shape6 = phys2D.createPolygonShape({
-			vertices: [[2000/viewport.scale, 0], [2000/viewport.scale, -50/viewport.scale], [3500/viewport.scale, -50/viewport.scale], [3500/viewport.scale, 0]]
-		});
-		cool_floor.shape7 = phys2D.createPolygonShape({
-			vertices: [[3500/viewport.scale, -50/viewport.scale], [5000/viewport.scale, -420/viewport.scale], [5000/viewport.scale, -50/viewport.scale]]
-		});
-		cool_floor.shape8 = phys2D.createPolygonShape({
-			vertices: [[5000/viewport.scale, 0], [5000/viewport.scale, -50/viewport.scale], [20000/viewport.scale, -50/viewport.scale], [20000/viewport.scale, 0]]
-		});
-		cool_floor.shape9 = phys2D.createPolygonShape({
-			vertices: [[20000/viewport.scale, 0], [20000/viewport.scale, -1080/viewport.scale], [20100/viewport.scale, -1080/viewport.scale], [20100/viewport.scale, 0]]
+			vertices : [[1200 / viewport.scale, -400 / viewport.scale], [1200 / viewport.scale, -500 / viewport.scale], [2000 / viewport.scale, -400 / viewport.scale]]
 		});
 		cool_floor.rB = phys2D.createRigidBody({
 			type : 'static',
-			shapes : [cool_floor.shape0, cool_floor.shape1, cool_floor.shape2, cool_floor.shape3, cool_floor.shape4, cool_floor.shape5, cool_floor.shape6, cool_floor.shape7, cool_floor.shape8, cool_floor.shape9],
+			shapes : [cool_floor.shape1, cool_floor.shape2, cool_floor.shape3, cool_floor.shape4, cool_floor.shape5],
 			position : cool_floor.position
 		});
 		world.addRigidBody(cool_floor.rB);
@@ -630,7 +454,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 	function createCar() {
 		//car
 		car = {
-			position : [15, viewport.m_height / 3]
+			position : [viewport.m_width / 2, viewport.m_height / 3]
 		};
 		car.shape1 = phys2D.createPolygonShape({
 			vertices : [[-217 / viewport.scale, 69.5 / viewport.scale], [-217 / viewport.scale, 19.5 / viewport.scale], [140 / viewport.scale, 19.5 / viewport.scale], [140 / viewport.scale, 69.5 / viewport.scale]],
@@ -642,7 +466,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 			group : 4,
 			mask : 9
 		});
-		// car.shape3 = phys2D.createPolygonShape({}); removed cause unnecessary
+		// car.shape3 = phys2D.createPolygonShape({});
 		car.shape4 = phys2D.createPolygonShape({
 			vertices : [[70 / viewport.scale, -12.5 / viewport.scale], [70 / viewport.scale, -31.5 / viewport.scale], [185 / viewport.scale, -22 / viewport.scale], [185 / viewport.scale, -12.5 / viewport.scale]]
 		});
@@ -655,7 +479,7 @@ TurbulenzEngine.onload = function onLoadFn() {
 		car.shape7 = phys2D.createPolygonShape({
 			vertices : [[-217 / viewport.scale, -95.5 / viewport.scale], [-217 / viewport.scale, -113.5 / viewport.scale], [8 / viewport.scale, -113.5 / viewport.scale], [8 / viewport.scale, -95.5 / viewport.scale]]
 		});
-		// car.shape8 = phys2D.createPolygonShape({}); removed cause unnecessary
+		// car.shape8 = phys2D.createPolygonShape({});
 		car.wheelL = phys2D.createCircleShape({
 			radius : 50 / viewport.scale,
 			origin : [0, 0],
@@ -762,60 +586,20 @@ TurbulenzEngine.onload = function onLoadFn() {
 		//create custom world unloading
 
 		//Build
-		draw2DViewportRectangle = [viewport.x, viewport.y, viewport.px_width, viewport.px_height];
-		physicsDebugViewport = [viewport.x / 30, viewport.y / 30, viewport.m_width, viewport.m_height];
+		viewport = {
+			scale : 30,
+			x : 0,
+			y : 0,
+			px_width : 1920,
+			px_height : 1080,
+			m_width : 1920 / 30,
+			m_height : 1080 / 30
+		};
 		createDefaultLevel();
 		createCar();
 	}
 
+	//intervalID = TurbulenzEngine.setInterval(mainLoop, 1000 / 60);
+	//TODO change. just debuging
 	intervalID = TurbulenzEngine.setInterval(load, 1000 / 60);
 };
-
-        // Engine startup
-        window.onload = function ()
-        {
-            var appEntry = TurbulenzEngine.onload;
-            var appShutdown = TurbulenzEngine.onunload;
-            if (!appEntry) {
-                window.alert("TurbulenzEngine.onload has not been set");
-                return;
-            }
-
-            var canvas =
-                document.getElementById('turbulenz_game_engine_canvas');
-
-            var startCanvas = function startCanvasFn()
-            {
-                if (canvas.getContext && canvasSupported)
-                {
-                    TurbulenzEngine = WebGLTurbulenzEngine.create({
-                        canvas: canvas,
-                        fillParent: true
-                    });
-
-                    if (!TurbulenzEngine) {
-                        window.alert("Failed to init TurbulenzEngine (canvas)");
-                        return;
-                    }
-
-                    TurbulenzEngine.onload = appEntry;
-                    TurbulenzEngine.onunload = appShutdown;
-                    appEntry()
-                }
-            }
-
-            var previousOnBeforeUnload = window.onbeforeunload;
-            window.onbeforeunload = function ()
-            {
-                if (TurbulenzEngine.onunload) {
-                    TurbulenzEngine.onunload.call(this);
-                }
-            };  // window.beforeunload
-
-            startCanvas();
-        };  // window.onload()
-
-    </script>
-
-</body>
-</html>
