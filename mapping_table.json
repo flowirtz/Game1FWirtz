@@ -1,8 +1,11 @@
 {
     "urnmapping": {
-        "assets/Game1_sprite1_v2.0.png": "YXNzZXRzL0dhbWUxX3Nwcml0ZTFfdjIuMC5wbmc=.png",
-        "assets/Game1_sprite2_v1.png": "YXNzZXRzL0dhbWUxX3Nwcml0ZTJfdjEucG5n.png",
-        "assets/welcome.mp3": "YXNzZXRzL3dlbGNvbWUubXAz.mp3"
+        "assets/Game1_Sprite1_v020.png": "1cd53d6ee4e2f73402b85c30ab4d6e58.png",
+        "assets/Game1_Sprite2_v020.png": "00abb9d914029d65195f7692ea88a2a4.png",
+        "assets/welcome.mp3": "2feebd7ca95a986d575835d674907ecd.mp3",
+		"font/ArialBlack.fnt": "ac7a0362756e2584945dc49329122f63.json",
+		"textures/ArialBlack_bmap_0.tga": "39c6f6782392a2c2dc249137333e1ff7.tga",
+		"levels/LevelDemo.json": "123456.json"
     },
     "version": 1.0
 }
