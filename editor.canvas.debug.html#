@@ -1,0 +1,593 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>
+        editor
+    </title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    <style type="text/css">
+html, body, div, span, object, iframe, h1, h2, p, a, img, ul, li, fieldset, form, label, legend, table, thead, tbody, tfoot, tr, th, td {
+    border: 0;
+    font-size: 100%;
+    margin: 0;
+    outline: 0;
+    padding: 0;
+    vertical-align: baseline;
+}
+    </style>
+    <!-- block tz_app_header -->
+    
+    <!-- end tz_app_header -->
+</head>
+<body style="background:#B4B4B4;font:normal normal normal 13px/1.231 Helvetica,Arial,sans-serif;text-shadow:1px 1px #F9F8F8;">
+    <div id="titlebar" style="position:fixed;height:65px;top:0;right:0;left:0;">
+        <strong style="font-size:24px;line-height:64px;margin:16px;">
+            <!-- block tz_app_title_name -->
+            
+            editor
+            
+            <!-- end tz_app_title_name -->
+        </strong>
+        <div id="titlelogo"
+             style="float:right;width:27px;height:27px;margin:18px 24px;">
+        </div>
+    </div>
+    <div id="sidebar"
+         style="background:#B4B4B4;position:fixed;width:303px;top:65px;left:0;">
+        <!-- block tz_app_html_controls -->
+        
+        
+        <!-- end tz_app_html_controls -->
+    </div>
+    <div id="engine" style="background:#939393;position:fixed;top:65px;
+                            bottom:0;right:0;left:303px;
+                            border-left:1px solid #898989;">
+        <!--
+          HTML to create a plugin or canvas instance.
+          Supplied by 'tz_engine_div' variable.
+        -->
+        
+        <canvas id="turbulenz_game_engine_canvas" moz-opaque="true" tabindex="1">
+            Sorry, but your browser does not support WebGL or does not have it
+            enabled.  To get a WebGL-enabled browser, please see:<br/>
+            <a href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" target="_blank">
+                Getting a WebGL Implementation
+            </a>
+        </canvas>
+
+        <script type="text/javascript">
+            var canvasSupported = true;
+            (function()
+            {
+                var contextNames = ["webgl", "experimental-webgl"];
+                var context = null;
+                var canvas = document.createElement('canvas');
+
+                document.body.appendChild(canvas);
+
+                for (var i = 0; i < contextNames.length; i += 1)
+                {
+                    try {
+                        context = canvas.getContext(contextNames[i]);
+                    } catch (e) {}
+
+                    if (context) {
+                        break;
+                    }
+                }
+                if (!context)
+                {
+                    canvasSupported = false;
+                    window.alert("Sorry, but your browser does not support WebGL or does not have it enabled.");
+                }
+
+                document.body.removeChild(canvas);
+            }());
+            var TurbulenzEngine = {};
+        </script>
+    </div>
+
+    <!-- begin 'tz_include_js' variable -->
+    <script type="text/javascript" src="jslib/debug.js"></script>
+<script type="text/javascript" src="jslib/vmath.js"></script>
+<script type="text/javascript" src="jslib/utilities.js"></script>
+<script type="text/javascript" src="jslib/aabbtree.js"></script>
+<script type="text/javascript" src="jslib/observer.js"></script>
+<script type="text/javascript" src="jslib/webgl/ddsloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/graphicsdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/inputdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/mathdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/networkdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/physicsdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/sounddevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/soundtarloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/tarloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/tgaloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/touch.js"></script>
+<script type="text/javascript" src="jslib/webgl/touchevent.js"></script>
+<script type="text/javascript" src="jslib/webgl/turbulenzengine.js"></script>
+<script type="text/javascript" src="jslib/draw2d.js"></script>
+<script type="text/javascript" src="jslib/requesthandler.js"></script>
+<script type="text/javascript" src="jslib/services/turbulenzservices.js"></script>
+<script type="text/javascript" src="jslib/services/turbulenzbridge.js"></script>
+<script type="text/javascript" src="jslib/services/gamesession.js"></script>
+<script type="text/javascript" src="jslib/physics2ddevice.js"></script>
+<script type="text/javascript" src="jslib/physics2ddebugdraw.js"></script>
+<script type="text/javascript" src="jslib/boxtree.js"></script>
+<script type="text/javascript" src="jslib/services/mappingtable.js"></script>
+<script type="text/javascript" src="jslib/texturemanager.js"></script>
+<script type="text/javascript" src="jslib/fontmanager.js"></script>
+    <!-- end 'tz_include_js' variable -->
+
+    <script type="text/javascript">
+      // ----------------------------------------
+      // Embedded code and startup code.
+      // Supplied by 'tz_startup_code' variable.
+      // ----------------------------------------
+      
+/*
+ * @title: Game 1 Leveleditor
+ * @description:
+ * A Leveleditor for Game1
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TurbulenzEngine.onload = function onLoadFn() {
+    //===================================================
+    //   Turbulenz Initialization                       =
+    //===================================================
+    var bgColor = [0.1, 0.1, 0.2, 1];
+    var font;
+    var errorCallback = function errorCallbackFn(msg) {
+        window.alert(msg);
+    };
+
+    var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
+    var mathDevice = TurbulenzEngine.createMathDevice({});
+    var requestHandler = RequestHandler.create({});
+    var textureManager = TextureManager.create(graphicsDevice, requestHandler, null, errorCallback);
+    var fontManager = FontManager.create(graphicsDevice, requestHandler);
+
+    var viewport = {
+        scale : 30,
+        x : 0,
+        y : 0,
+        px_width : 1920,
+        px_height : 1080,
+        m_width : 1920 / 30,
+        m_height : 1080 / 30
+    };
+
+    var mappingTableReceived = function mappingTableReceivedFn(mappingTable) {
+        textureManager.setPathRemapping(mappingTable.urlMapping, mappingTable.assetPrefix);
+        fontManager.setPathRemapping(mappingTable.urlMapping, mappingTable.assetPrefix);
+        loadAssets(mappingTable);
+        fontManager.load("font/ArialBlack.fnt", function (fontObject) {
+            font = fontObject;
+        });
+        
+        intervalID = TurbulenzEngine.setInterval(mainLoop, 1000 / 60);
+    };
+
+    var gameSession;
+    function sessionCreated(gameSession) {
+        TurbulenzServices.createMappingTable(requestHandler, gameSession, mappingTableReceived);
+        
+    }
+
+    gameSession = TurbulenzServices.createGameSession(requestHandler, sessionCreated);
+
+    //Initialize
+    //===================================================
+    //   Physic                                          =
+    //===================================================
+    var phys2D = Physics2DDevice.create();
+    var p_debug = Physics2DDebugDraw.create({
+        graphicsDevice : graphicsDevice
+    });
+    p_debug.setPhysics2DViewport([viewport.x, viewport.y, viewport.m_width, viewport.m_height]);
+
+    //world
+    var world = phys2D.createWorld({
+        gravity : [0, 35]
+    });
+
+    var shape = phys2D.createPolygonShape({
+        vertices: [[0, 18], [20, 18], [20, 38], [0, 38]]
+    });
+    var body = phys2D.createRigidBody({
+        type: "dynamic",
+        shapes: [shape],
+        position: [0, 0]
+    });
+    world.addRigidBody(body);
+    console.log("Done creatin body");
+
+    //===================================================
+    //   Draw2D                                         =
+    //===================================================
+    //setup
+    var draw2D = Draw2D.create({
+        graphicsDevice : graphicsDevice
+    });
+
+    //configure
+    draw2D.configure({
+        viewportRectangle : [viewport.x, viewport.y, viewport.px_width, viewport.px_height],
+        scaleMode : "scale"
+    });
+
+    //create Sprites & stuff's
+
+
+    //===================================================
+    //   Input                                          =
+    //===================================================
+    var inputDevice = TurbulenzEngine.createInputDevice({});
+    var keyCodes = inputDevice.keyCodes;
+    var mouseCodes = inputDevice.mouseCodes;
+
+    var onKeyUp = this.onKeyUp = function onKeyUpFn(keynum) {
+        if (keynum === keyCodes.R) {
+            console.log("called restart");
+        }
+    };
+    inputDevice.addEventListener("keyup", onKeyUp);
+
+    var onMouseDown = function onMouseDownFn(mouseCode, input_x, input_y) {
+        var point = draw2D.viewportMap(input_x, input_y);
+
+        if (mouseCode === mouseCodes.BUTTON_0 || mouseCodes.BUTTON_1) {
+            //do some
+        }
+    };
+    inputDevice.addEventListener("mousedown", onMouseDown);
+
+    var loadAssets = function loadAssetsFn(mappingTable) {
+        //textures
+        //textureManager.load("assets/Game1_Sprite1_v020.png");
+    };
+
+    //===================================================
+    //   Main Loop                                      =
+    //===================================================
+    var realTime = 0;
+    var prevTime = TurbulenzEngine.time;
+
+    var draw2DViewportRectangle = [viewport.x, viewport.y, viewport.px_width, viewport.px_height];
+    var physicsDebugViewport = [viewport.x / 30, viewport.y / 30, viewport.m_width, viewport.px_height-250];
+    function mainLoop() {
+        //Tick Tock Tick Tock...
+        var curTime = TurbulenzEngine.time;
+        var timeDelta = (curTime - prevTime);
+        if (timeDelta > (1 / 20)) {
+            timeDelta = (1 / 20);
+        }
+        realTime += timeDelta;
+        prevTime = curTime;
+
+        callMe();
+
+        if (graphicsDevice.beginFrame()) {
+            graphicsDevice.clear(bgColor, 1.0);
+
+            while (world.simulatedTime < realTime) {
+                world.step(1 / 60);
+            }
+
+            /*draw2D.configure({
+                viewportRectangle : draw2DViewportRectangle,
+                scaleMode : "scale"
+            });
+            p_debug.setPhysics2DViewport(physicsDebugViewport);
+
+            p_debug.setScreenViewport(draw2D.getScreenSpaceViewport());*/
+            p_debug.begin();
+            p_debug.drawWorld(world);
+            p_debug.end();
+
+            //Dra2D Sprite Drawing
+            draw2D.begin("alpha");
+            //draw2D.drawSprite(ui_button_pause); //draw sprites here
+
+            //TEXT TEXT TEXT TEXT
+            var vertices = font.generateTextVertices(("Hello!"), {
+                rect: [10, 10, 500, 500],
+                scale: 2.0,
+                spacing: 0,
+                alignment: 1
+            }, 0);
+            if(vertices) {
+                font.drawTextVertices(vertices, 0);
+            }
+
+            draw2D.end();
+            graphicsDevice.endFrame();
+        }
+    }
+
+    TurbulenzEngine.onerror = function gameErrorFn(msg) {
+        window.alert(msg);
+    };
+
+        function createCar() {
+        //car
+        car = {
+            position : [15, viewport.m_height / 3]
+        };
+        car.shape1 = phys2D.createPolygonShape({
+            vertices : [[-217 / viewport.scale, 69.5 / viewport.scale], [-217 / viewport.scale, 19.5 / viewport.scale], [140 / viewport.scale, 19.5 / viewport.scale], [140 / viewport.scale, 69.5 / viewport.scale]],
+            group : 4,
+            mask : 9
+        });
+        car.shape2 = phys2D.createPolygonShape({
+            vertices : [[-217 / viewport.scale, 19.5 / viewport.scale], [-217 / viewport.scale, -12.5 / viewport.scale], [219 / viewport.scale, -12.5 / viewport.scale], [219 / viewport.scale, 19.5 / viewport.scale]],
+            group : 4,
+            mask : 9
+        });
+        // car.shape3 = phys2D.createPolygonShape({}); removed cause unnecessary
+        car.shape4 = phys2D.createPolygonShape({
+            vertices : [[70 / viewport.scale, -12.5 / viewport.scale], [70 / viewport.scale, -31.5 / viewport.scale], [185 / viewport.scale, -22 / viewport.scale], [185 / viewport.scale, -12.5 / viewport.scale]]
+        });
+        car.shape5 = phys2D.createPolygonShape({
+            vertices : [[-217 / viewport.scale, -12.5 / viewport.scale], [-217 / viewport.scale, -95.5 / viewport.scale], [40 / viewport.scale, -95.5 / viewport.scale], [40 / viewport.scale, -12.5 / viewport.scale]]
+        });
+        car.shape6 = phys2D.createPolygonShape({
+            vertices : [[40 / viewport.scale, -12.5 / viewport.scale], [40 / viewport.scale, -95.5 / viewport.scale], [70 / viewport.scale, -31.5 / viewport.scale], [70 / viewport.scale, -12.5 / viewport.scale]]
+        });
+        car.shape7 = phys2D.createPolygonShape({
+            vertices : [[-217 / viewport.scale, -95.5 / viewport.scale], [-217 / viewport.scale, -113.5 / viewport.scale], [8 / viewport.scale, -113.5 / viewport.scale], [8 / viewport.scale, -95.5 / viewport.scale]]
+        });
+        // car.shape8 = phys2D.createPolygonShape({}); removed cause unnecessary
+        car.wheelL = phys2D.createCircleShape({
+            radius : 50 / viewport.scale,
+            origin : [0, 0],
+            group : 4,
+            mask : 9
+        });
+        car.wheelL_rB = phys2D.createRigidBody({
+            type : "dynamic",
+            shapes : [car.wheelL],
+            position : [viewport.m_width / 3, viewport.m_height / 2]
+        });
+        car.wheelR = phys2D.createCircleShape({
+            radius : 50 / viewport.scale,
+            origin : [0, 0],
+            group : 4,
+            mask : 9
+        });
+        car.wheelR_rB = phys2D.createRigidBody({
+            type : "dynamic",
+            shapes : [car.wheelR],
+            position : [viewport.m_width / 3 * 2, viewport.m_height / 2]
+        });
+        car.rigidBody = phys2D.createRigidBody({
+            type : "dynamic",
+            shapes : [car.shape1, car.shape2, car.shape4, car.shape5, car.shape6, car.shape7],
+            position : car.position
+        });
+        //constraints
+        car.aConstraint = phys2D.createAngleConstraint({
+            bodyA : car.wheelR_rB,
+            bodyB : car.wheelL_rB,
+            ratio : 1
+        });
+        car.dConstraint1 = phys2D.createDistanceConstraint({
+            bodyA : car.wheelL_rB,
+            bodyB : car.rigidBody,
+            anchorB : [-153 / viewport.scale, 0],
+            lowerBound : 80 / viewport.scale,
+            upperBound : 100 / viewport.scale
+        });
+        car.dConstraint2 = phys2D.createDistanceConstraint({
+            bodyA : car.wheelL_rB,
+            bodyB : car.rigidBody,
+            anchorB : [-113 / viewport.scale, 0],
+            lowerBound : 80 / viewport.scale,
+            upperBound : 100 / viewport.scale
+        });
+        car.dConstraint3 = phys2D.createDistanceConstraint({
+            bodyA : car.wheelR_rB,
+            bodyB : car.rigidBody,
+            anchorB : [143 / viewport.scale, 0],
+            lowerBound : 80 / viewport.scale,
+            upperBound : 100 / viewport.scale
+        });
+        car.dConstraint4 = phys2D.createDistanceConstraint({
+            bodyA : car.wheelR_rB,
+            bodyB : car.rigidBody,
+            anchorB : [183 / viewport.scale, 0],
+            lowerBound : 80 / viewport.scale,
+            upperBound : 100 / viewport.scale
+        });
+        car.lConstraint1 = phys2D.createLineConstraint({
+            bodyA : car.rigidBody,
+            bodyB : car.wheelL_rB,
+            axis : [0, 1],
+            anchorA : [-133 / viewport.scale, -12.5 / viewport.scale],
+            lowerBound : 1,
+            upperBound : 4
+        });
+        car.lConstraint2 = phys2D.createLineConstraint({
+            bodyA : car.rigidBody,
+            bodyB : car.wheelR_rB,
+            axis : [0, 1],
+            anchorA : [163 / viewport.scale, -12.5 / viewport.scale],
+            lowerBound : 1,
+            upperBound : 4
+        });
+        car.movement = 0;
+        /*
+         * 0 -> not moving
+         * 1 -> moving right
+         * 2 -> moving left
+         */
+        car.speed = 10;
+        car.airTime = 0; //needed?
+        car.wheelL.vars = {
+            flying: true,
+            lastCollisionStart: 0,
+            lastCollisionEnd: 0,
+            startCollision: function startCollsionFn() {
+                               car.wheelL.vars.flying = false;
+                               car.wheelL.vars.lastCollisionStart = TurbulenzEngine.time;
+                            },
+            endCollision: function endCollisionFn() {
+                              car.wheelL.vars.flying = true;
+                              car.wheelL.vars.lastCollisionEnd = TurbulenzEngine.time;
+                          },
+            duringCollision: function duringCollisionFn() {
+                                 car.wheelL.vars.flying = false;
+                             }
+        };
+        car.wheelR.vars = {
+            flying: true,
+            lastCollisionStart: 0,
+            lastCollisionEnd: 0,
+            startCollision: function startCollsionFn() {
+                               car.wheelR.vars.flying = false;
+                               car.wheelR.vars.lastCollisionStart = TurbulenzEngine.time;
+                            },
+            endCollision: function endCollisionFn() {
+                              car.wheelR.vars.flying = true;
+                              car.wheelR.vars.lastCollisionEnd = TurbulenzEngine.time;
+                          },
+            duringCollision: function duringCollisionFn() {
+                                 car.wheelR.vars.flying = false;
+                             }
+        };
+        car.flying = function flyingFn() {
+                         if(car.wheelL.vars.flying && car.wheelR.vars.flying) {
+                            return true;
+                         }
+                         return false;
+                     };
+        car.prevPos = Math.floor((car.wheelL_rB.getPosition())[0]);
+
+        car.shape7.addEventListener("begin", restart);
+
+        car.wheelL.addEventListener("begin", car.wheelL.vars.startCollision);
+        car.wheelL.addEventListener("end", car.wheelL.vars.endCollision);
+        car.wheelL.addEventListener("progress", car.wheelL.vars.duringCollision);
+        car.wheelR.addEventListener("begin", car.wheelR.vars.startCollision);
+        car.wheelR.addEventListener("end", car.wheelR.vars.endCollision);
+        car.wheelR.addEventListener("progress", car.wheelR.vars.duringCollision);
+
+        world.addRigidBody(car.rigidBody);
+        world.addRigidBody(car.wheelL_rB);
+        world.addRigidBody(car.wheelR_rB);
+        world.addConstraint(car.aConstraint);
+        world.addConstraint(car.dConstraint1);
+        world.addConstraint(car.dConstraint2);
+        world.addConstraint(car.dConstraint3);
+        world.addConstraint(car.dConstraint4);
+        world.addConstraint(car.lConstraint1);
+        world.addConstraint(car.lConstraint2);
+    }
+
+    var thirdPoint = null, myShape = null, myBody = null;
+    function createPolygonShapeFromPoints(point1, point2) {
+        //check if point1 & point have same y-value (same height -> create RectangleShape)
+        if(point1[1] === point2[1]) {
+            var fixedHeight = 20; //Fixed Height. Remove var from here & adjust.
+            console.log("Imma called!");
+            myShape = phys2D.createPolygonShape({
+                vertices : [[point1[0], point1[1]], [point2[0], point2[1]], [point2[0], (point2[1]+fixedHeight)], [point1[0], (point1[1]+fixedHeight)]]
+            });
+        }
+        /*//else create a triangular shape [more complicated... O.o]
+        else {
+            //check if point1 is higher than point2 (higher y-value)
+            if(point1[1] > point2[1]) {
+                thirdPoint = [point1[0], point2[1]];
+            }
+            else {
+               thirdPoint = [point2[0], point1[1]];
+            }
+            myShape = phys2D.createPolygonShape({
+               vertices : [[point1[0], point1[1]], [point2[0], point2[1]], [thirdPoint[0], thirdPoint[1]]]
+            });
+        }*/
+        myBody = phys2D.createRigidBody({
+            type: "static",
+            shapes: [myShape],
+            position: [1920/2/30, 1080/2/30]
+        });
+        world.addRigidBody(myBody);
+    }
+
+    var called = false;
+    function callMe() {
+        if(called) {
+            var myPoint1 = [0, 18];
+            var myPoint2 = [20, 18];
+            createPolygonShapeFromPoints(myPoint1, myPoint2);
+            called = true;
+        }
+    }
+
+    var intervalID;
+};
+
+        // Engine startup
+        window.onload = function ()
+        {
+            var appEntry = TurbulenzEngine.onload;
+            var appShutdown = TurbulenzEngine.onunload;
+            if (!appEntry) {
+                window.alert("TurbulenzEngine.onload has not been set");
+                return;
+            }
+
+            var canvas =
+                document.getElementById('turbulenz_game_engine_canvas');
+
+            var startCanvas = function startCanvasFn()
+            {
+                if (canvas.getContext && canvasSupported)
+                {
+                    TurbulenzEngine = WebGLTurbulenzEngine.create({
+                        canvas: canvas,
+                        fillParent: true
+                    });
+
+                    if (!TurbulenzEngine) {
+                        window.alert("Failed to init TurbulenzEngine (canvas)");
+                        return;
+                    }
+
+                    TurbulenzEngine.onload = appEntry;
+                    TurbulenzEngine.onunload = appShutdown;
+                    appEntry()
+                }
+            }
+
+            var previousOnBeforeUnload = window.onbeforeunload;
+            window.onbeforeunload = function ()
+            {
+                if (TurbulenzEngine.onunload) {
+                    TurbulenzEngine.onunload.call(this);
+                }
+            };  // window.beforeunload
+
+            startCanvas();
+        };  // window.onload()
+
+    </script>
+
+</body>
+</html>

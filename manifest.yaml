@@ -5,7 +5,7 @@ deploy_files:
 - game1.canvas.js
 - mapping_table.json
 - staticmax/
-deployed: 20:19 | 24/02/2014
+deployed: 18:46 | 14/04/2014
 engine_version: '0.27'
 flash_main: ''
 has_notifications: false
@@ -13,7 +13,7 @@ is_multiplayer: false
 is_temp: false
 mapping_table: mapping_table.json
 modified: 20:41 | 17/02/2014
-path: C:\Users\FlorianLokal\Desktop\game1_FWirtz
+path: C:\Users\Flo\Desktop\game1_FWirtz
 plugin_main: ''
 slug: game1-fwirtz
 title: Game1 FWirtz
